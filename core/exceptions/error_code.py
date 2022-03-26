@@ -6,3 +6,6 @@ class ErrorCode:
     class User:
         PasswordDoesNotMatch = 20000
         DuplicateEmailOrNickname = 20001
+
+    class Auth:
+        IncorrectEmailOrPassword = 30000

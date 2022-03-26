@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -12,6 +13,8 @@ from core.fastapi.middlewares import (
     AuthenticationMiddleware,
     AuthBackend,
 )
+from core.db.session import engine
+from . import models
 
 
 def init_cors(app: FastAPI) -> None:
@@ -25,8 +28,8 @@ def init_cors(app: FastAPI) -> None:
 
 
 def init_routers(app: FastAPI) -> None:
-    #app.include_router(home_router)
-    app.include_router(v1_router, prefix="/api/v1", tags=["User"])
+    # app.include_router(home_router)
+    app.include_router(v1_router, prefix="/api/v1")
 
 
 def init_listeners(app: FastAPI) -> None:
@@ -47,18 +50,23 @@ def on_auth_error(request: Request, exc: Exception):
         message = exc.message
 
     return JSONResponse(
-        status_code=status_code, content={"error_code": error_code, "message": message},
+        status_code=status_code,
+        content={"error_code": error_code, "message": message},
     )
 
 
 def init_middleware(app: FastAPI) -> None:
     app.add_middleware(SQLAlchemyMiddleware)
     app.add_middleware(
-        AuthenticationMiddleware, backend=AuthBackend(), on_error=on_auth_error,
+        AuthenticationMiddleware,
+        backend=AuthBackend(),
+        on_error=on_auth_error,
     )
 
 
 def create_app() -> FastAPI:
+    models.Base.metadata.create_all(bind=engine)
+
     app = FastAPI(
         title="Password wallet",
         description="Application for storing passwords safely",
@@ -67,6 +75,7 @@ def create_app() -> FastAPI:
         redoc_url=None if config.ENV == "production" else "/redoc",
         dependencies=[Depends(Logging)],
     )
+    # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth")
     init_routers(app=app)
     init_cors(app=app)
     init_listeners(app=app)

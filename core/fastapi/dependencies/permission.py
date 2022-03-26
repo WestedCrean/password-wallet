@@ -27,13 +27,14 @@ class BasePermission(ABC):
 
     @abstractmethod
     async def has_permission(self, request: Request) -> bool:
-        pass
+        return True
 
 
 class IsAuthenticated(BasePermission):
     exception = UnauthorizedException
 
     async def has_permission(self, request: Request) -> bool:
+        print(f"request.user : {request.user}")
         return request.user.id is not None
 
 

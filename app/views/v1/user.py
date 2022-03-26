@@ -17,6 +17,15 @@ from core.fastapi.dependencies import (
 user_router = APIRouter()
 
 
+@user_router.post(
+    "",
+    response_model=CreateUserResponseSchema,
+    responses={"400": {"model": ExceptionResponseSchema}},
+)
+async def create_user(request: CreateUserRequestSchema):
+    return await UserService().create_user(**request.dict())
+
+
 @user_router.get(
     "",
     response_model=List[GetUserListResponseSchema],
@@ -26,12 +35,3 @@ user_router = APIRouter()
 )
 async def get_user_list(limit: int = 10, prev: int = None):
     return await UserService().get_user_list(limit=limit, prev=prev)
-
-
-@user_router.post(
-    "",
-    response_model=CreateUserResponseSchema,
-    responses={"400": {"model": ExceptionResponseSchema}},
-)
-async def create_user(request: CreateUserRequestSchema):
-    return await UserService().create_user(**request.dict())

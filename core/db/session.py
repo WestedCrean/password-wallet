@@ -22,9 +22,9 @@ def reset_session_context(context: Token) -> None:
     session_context.reset(context)
 
 
-engine = create_engine(config.DB_URL)
+engine = create_engine(config.DB_URL, connect_args={"check_same_thread": False})
 session: Union[Session, scoped_session] = scoped_session(
-    sessionmaker(autocommit=True, autoflush=False, bind=engine),
+    sessionmaker(autocommit=False, autoflush=False, bind=engine),
     scopefunc=get_session_id,
 )
 Base = declarative_base()

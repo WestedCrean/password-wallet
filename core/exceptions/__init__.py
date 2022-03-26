@@ -10,8 +10,10 @@ from .base import (
 from .token import DecodeTokenException, ExpiredTokenException
 from .user import (
     PasswordDoesNotMatchException,
-    DuplicateEmailOrNicknameException,
+    DuplicateEmailException,
 )
+
+from .auth import LoginFailureException
 
 
 __all__ = [
@@ -25,5 +27,5 @@ __all__ = [
     "DecodeTokenException",
     "ExpiredTokenException",
     "PasswordDoesNotMatchException",
-    "DuplicateEmailOrNicknameException",
+    "DuplicateEmailException",
 ]

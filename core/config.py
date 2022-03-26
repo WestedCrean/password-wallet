@@ -8,22 +8,22 @@ class Config(BaseSettings):
     DEBUG: bool = True
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
-    DB_URL: str = "sqlite:///./sql_app.db"
+    DB_URL: str = "sqlite:///testdb.sqlite"
     JWT_SECRET_KEY: str = "fastapi"
     JWT_ALGORITHM: str = "HS256"
 
 
 class DevelopmentConfig(Config):
-    DB_URL: str = "sqlite:///./sql_app.db"
+    DB_URL: str = "sqlite:///testdb.sqlite"
 
 
 class LocalConfig(Config):
-    DB_URL: str = "sqlite:///./sql_app.db"
+    DB_URL: str = "sqlite:///testdb.sqlite"
 
 
 class ProductionConfig(Config):
     DEBUG: str = False
-    DB_URL: str = "sqlite:///./sql_app.db"
+    DB_URL: str = "sqlite:///testdb.sqlite"
 
 
 def get_config():
