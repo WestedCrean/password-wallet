@@ -4,6 +4,7 @@ import os
 import hashlib
 import base64
 import uuid
+import time
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.fernet import Fernet
 
@@ -33,27 +34,20 @@ class CryptoService:
 
     @staticmethod
     def encrypt_password(password: str, master_key: str) -> str:
-        encryption_key = hashlib.md5(master_key.encode())
-        print("Number of bytes in a string:", len(encryption_key.digest()))
-        # encrypt using AES with cryptography package
-        cipher = Cipher(
-            algorithms.AES(encryption_key.digest()),
-            modes.CBC(b"\x00" * 16),
-        )
-        encryptor = cipher.encryptor()
-        ciphertext = encryptor.update(password.encode()) + encryptor.finalize()
-        return base64.b64encode(ciphertext).decode()
+        encryption_key = hashlib.md5(master_key.encode("utf-8"))
+        concat = hashlib.sha256()
+        concat.update(encryption_key.digest())
+        concat.update(encryption_key.digest())
+        encryption_key = base64.b64encode(concat.digest())[:44]
+        f = Fernet(encryption_key)
+        return f.encrypt(password.encode("utf-8"))
 
     @staticmethod
     def decrypt_password(password: str, master_key: str) -> Optional[str]:
-        # decrypt password with master key
-        encryption_key = hashlib.md5(master_key.encode())
-        # decrypt using AES with cryptography package
-        cipher = Cipher(
-            algorithms.AES(encryption_key.digest()),
-            modes.CBC(b"\x00" * 16),
-        )
-        decryptor = cipher.decryptor()
-        ciphertext = base64.b64decode(password)
-        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-        return plaintext.decode()
+        encryption_key = hashlib.md5(master_key.encode("utf-8"))
+        concat = hashlib.sha256()
+        concat.update(encryption_key.digest())
+        concat.update(encryption_key.digest())
+        encryption_key = base64.b64encode(concat.digest())[:44]
+        f = Fernet(encryption_key)
+        return f.decrypt(password.encode("utf-8"))
